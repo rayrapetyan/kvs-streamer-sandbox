@@ -1,0 +1,10 @@
+Prototypes:
+
+Server:
+input.cpp: /ara/devel/sandbox/neko/server/internal/xorg/xorg.c
+input.h: /ara/devel/sandbox/neko/server/internal/xorg/xorg.h
+Samples.h: /ara/devel/sandbox/amazon-kinesis-video-streams-webrtc-sdk-c/samples/Samples.h
+main.cpp: /ara/devel/sandbox/amazon-kinesis-video-streams-webrtc-sdk-c/samples/kvsWebRTCClientMasterGstreamerSample.c
+
+Client:
+input.js: /ara/devel/sandbox/selkies-gstreamer/addons/gst-web/src/input.js

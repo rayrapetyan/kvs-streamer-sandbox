@@ -1,0 +1,33 @@
+.video-container {
+    background-color: black;
+    width: 100%;
+    height: 100%;
+}
+
+#logs-header {
+    margin-top: 20px;
+}
+
+.preserve-whitespace {
+    white-space: pre-wrap;
+}
+
+.video {
+    position: absolute;
+}
+
+pre .error {
+    color: red;
+}
+
+pre .warn {
+    color: goldenrod;
+}
+
+.scale {
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
