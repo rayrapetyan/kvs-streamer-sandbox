@@ -16,4 +16,6 @@ This will run a docker container with kvs-streamer webclient
 
 ## Host
 
-Navigate to: http://0.0.0.0:3001
+Navigate to: http://localhost:3001
+
+Note: use localhost! 0.0.0.0 will cause JS digest issues

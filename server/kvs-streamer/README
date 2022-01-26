@@ -1,5 +1,3 @@
-Prototypes:
-
 Server:
 input.cpp: /ara/devel/sandbox/neko/server/internal/xorg/xorg.c
 input.h: /ara/devel/sandbox/neko/server/internal/xorg/xorg.h

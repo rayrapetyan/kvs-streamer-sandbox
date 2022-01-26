@@ -36,15 +36,17 @@ else()
     message( FATAL_ERROR "gstreamer not found" )
 endif()
 
-include_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/src/include)
-include_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/open-source/include)
+#include_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/src/include)
+#include_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/open-source/include)
+#include_directories(/usr/local/include)
+#include_directories(/usr/include/libevdev-1.0)
 include_directories(/usr/local/include)
-include_directories(/usr/include/libevdev-1.0)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
-link_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/src/lib)
-link_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/open-source/lib)
-link_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/cmake-build-release)
+#link_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/src/lib)
+#link_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/open-source/lib)
+#link_directories(/src/amazon-kinesis-video-streams-webrtc-sdk-c/cmake-build-release)
+link_directories(/usr/local/lib)
 
 add_executable(
         kvs-streamer

@@ -301,7 +301,7 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                 g_object_set(
                         el_appsink_video,
                         "emit-signals", TRUE,
-                        "sync", TRUE,
+                        "sync", FALSE,
                         NULL);
                 pipeline = gst_pipeline_new("my_pipeline");
                 gst_bin_add_many(
@@ -319,7 +319,7 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                         el_x264enc, caps_x264enc, el_queue_delme, el_appsink_video, NULL) != TRUE)
                     g_printerr ("elements could not be linked.\n");
 
-                GstElement *el_pulsesrc = gst_element_factory_make("alsasrc", "audiosrc");
+                GstElement *el_pulsesrc = gst_element_factory_make("pulsesrc", "audiosrc");
                 g_object_set(
                         el_pulsesrc,
                         "provide-clock", TRUE,
@@ -342,7 +342,7 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                 g_object_set(
                         el_appsink_audio,
                         "emit-signals", TRUE,
-                        "sync", TRUE,
+                        "sync", FALSE,
                         NULL);
                 gst_bin_add_many(
                         GST_BIN(pipeline),

@@ -14,10 +14,10 @@ RUN git clone https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk
 
 WORKDIR /src/amazon-kinesis-video-streams-webrtc-sdk-js
 
+RUN npm install
+
 ADD examples ./examples
 ADD webpack.dev.config.js .
-
-RUN npm install
 
 EXPOSE 3001
 

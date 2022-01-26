@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 
-docker stop gstreamer-aws
-docker rm gstreamer-aws
+set -eux
+
+DOCKER_BUILD_TAG=kvs/server
+docker build -t $DOCKER_BUILD_TAG -f Dockerfile .
+
+set +e
+
+DOCKER_RUN_TAG=kvs-server
+docker stop $DOCKER_RUN_TAG
 
 docker run \
     -it \
-    --privileged \
+    --rm \
+    --name=$DOCKER_RUN_TAG \
+    --hostname=$DOCKER_RUN_TAG \
     --device=/dev/dri/card0:/dev/dri/card0 \
     --device=/dev/dri/renderD128:/dev/dri/renderD128 \
     --device=/dev/snd/seq:/dev/snd/seq \
-    --group-add=render \
-    --hostname="gstreamer-aws" \
     --shm-size="2g" \
-    --name="gstreamer-aws" \
-    test/gstreamer-aws:latest
+    $DOCKER_BUILD_TAG

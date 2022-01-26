@@ -2,12 +2,12 @@
 
 set -eux
 
-DOCKER_BUILD_TAG=kvs-streamer/webclient
+DOCKER_BUILD_TAG=kvs/webclient
 docker build -t $DOCKER_BUILD_TAG -f Dockerfile .
 
 set +e
 
-DOCKER_RUN_TAG=kvs-streamer-webclient
+DOCKER_RUN_TAG=kvs-webclient
 docker stop $DOCKER_RUN_TAG
 docker run \
     -it \
