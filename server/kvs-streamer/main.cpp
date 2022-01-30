@@ -16,6 +16,12 @@
 
 extern PSampleConfiguration gSampleConfiguration;
 
+#define MOUSE_BUTTON_LEFT 1
+#define MOUSE_BUTTON_MIDDLE 2
+#define MOUSE_BUTTON_RIGHT 3
+#define MOUSE_SCROLL_UP 5
+#define MOUSE_SCROLL_DOWN 6
+
 static GstPadProbeReturn
 cb_have_data (GstPad          *pad,
               GstPadProbeInfo *info,
@@ -40,7 +46,7 @@ std::string string_format(const std::string &format, Args ... args) {
 struct CustomData {
     int video_bitrate;
     std::string display_name;
-    int button_mask;
+    int button_code; // last mouse button pressed
 } custom_data;
 
 VOID onDataChannelMessage(UINT64 customData, PRtcDataChannel pDataChannel, BOOL isBinary, PBYTE pMessage,
@@ -57,12 +63,27 @@ VOID onDataChannelMessage(UINT64 customData, PRtcDataChannel pDataChannel, BOOL 
         boost::split(msg_parts, msg, boost::is_any_of(","));
         try {
             if (msg_parts[0] == "m") {
-                XMove(std::stoi(msg_parts[1]), std::stoi(msg_parts[2]));
+                int pos_x = std::stoi(msg_parts[1]);
+                int pos_y = std::stoi(msg_parts[2]);
+                XMove(pos_x, pos_y);
                 int button_mask = std::stoi(msg_parts[3]);
-                if (button_mask != my_custom_data->button_mask) {
-                    bool button_pressed = button_mask != 0;
-                    XButton(button_pressed ? button_mask : my_custom_data->button_mask, button_pressed);
-                    my_custom_data->button_mask = button_mask;
+                bool button_pressed = button_mask != 0;
+                int button_code = 0;
+                // button_mask to button_code (basically it's a "bit set" position)
+                while (button_mask)
+                {
+                    button_mask = button_mask >> 1;
+                    ++button_code;
+                }
+                // inverse scrolling. TODO: make it based on some flag
+                if (button_code == 4) {
+                    button_code = 5;
+                } else if (button_code == 5) {
+                    button_code = 4;
+                }
+                if (button_code != my_custom_data->button_code) {
+                    XButton(button_pressed ? button_code : my_custom_data->button_code, button_pressed);
+                    my_custom_data->button_code = button_code;
                 }
             }
         } catch (...) {
@@ -518,7 +539,7 @@ int main(INT32 argc, CHAR *argv[]) {
     pSampleConfiguration->araCustomData = &custom_data;
     custom_data.video_bitrate = video_bitrate;
     custom_data.display_name = display_name;
-    custom_data.button_mask = 0;
+    custom_data.button_code = 0;
 
     /* Initialize GStreamer */
     gst_init(&argc, &argv);

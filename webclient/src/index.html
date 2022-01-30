@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>KVS WebRTC Test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="loader.css">
+    <link rel="stylesheet" href="app.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.585.0.min.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="https://unpkg.com/amazon-kinesis-video-streams-webrtc/dist/kvs-webrtc.min.js"></script>
+    <link rel="icon" type="image/png" href="favicon.ico">
+</head>
+<body>
+
+<div class="container mt-3">
+    <div class="row loader"></div>
+    <div id="main" class="d-none">
+        <form id="form">
+            <h4>KVS WebRTC Test</h4>
+            <div>
+                <button id="viewer-button" type="button" class="btn btn-primary">Let's go!</button>
+            </div>
+        </form>
+
+        <div id="viewer" class="d-none">
+            <div class="video-container" style="cursor: none">
+                <video class="remote-view video scale" autoplay playsinline>Your browser doesn't support video</video>
+            </div>
+        </div>
+
+        <!---
+        <h3 id="logs-header">Logs</h3>
+        <div class="card bg-light mb-3">
+            <pre id="logs" class="card-body text-monospace preserve-whitespace"></pre>
+        </div>
+        --->
+
+    </div>
+</div>
+
+<div id="test"></div>
+
+<script src="./viewer.js"></script>
+<script src="./guacamole-keyboard-selkies.js?ts=1"></script>
+<script src="./input.js?ts=1"></script>
+<script src="./app.js"></script>
+
+</body>
+</html>
