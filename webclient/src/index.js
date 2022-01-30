@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/kinesis-video-url', (req, res) => {
-    kinesis.createChannel('KvsChannel', 'VIEWER', req.params['clientId']).then((response) => {
+    kinesis.createChannel('KvsChannel', 'VIEWER', req.query['clientId']).then((response) => {
         return res.status(200).json(response);
     });
 })
