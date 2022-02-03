@@ -22,6 +22,9 @@ extern PSampleConfiguration gSampleConfiguration;
 #define MOUSE_SCROLL_UP 5
 #define MOUSE_SCROLL_DOWN 6
 
+#define KEY_UP 0
+#define KEY_DOWN 1
+
 static GstPadProbeReturn
 cb_have_data (GstPad          *pad,
               GstPadProbeInfo *info,
@@ -84,6 +87,13 @@ VOID onDataChannelMessage(UINT64 customData, PRtcDataChannel pDataChannel, BOOL 
                 if (button_code != my_custom_data->button_code) {
                     XButton(button_pressed ? button_code : my_custom_data->button_code, button_pressed);
                     my_custom_data->button_code = button_code;
+                }
+            } else if (msg_parts[0] == "kd" || msg_parts[0] == "ku") {
+                KeySym key_code = std::stoi(msg_parts[1]);
+                if (msg_parts[0] == "kd") {
+                    XKey(key_code, KEY_DOWN);
+                } else if (msg_parts[0] == "ku") {
+                    XKey(key_code, KEY_UP);
                 }
             }
         } catch (...) {
@@ -289,10 +299,16 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                                 NULL
                         ),
                         NULL);
+                GstElement *el_queue_video = gst_element_factory_make("queue", NULL);
+                g_object_set(
+                    el_queue_video,
+                    "leaky", 1,
+                    NULL
+                );
                 GstElement *el_x264enc = gst_element_factory_make("x264enc", NULL);
                 g_object_set(
                         el_x264enc,
-                        "threads", 4,
+                        "threads", 1,
                         "bframes", 0,
                         "key-int-max", 0,
                         "byte-stream", true,
@@ -310,14 +326,6 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                                 NULL
                         ),
                         NULL);
-                GstElement *el_queue_delme = gst_element_factory_make("queue", NULL);
-                g_object_set(
-                        el_queue_delme,
-                        "leaky", 2,
-                        "max-size-time", 16000000,
-                        "max-size-buffers", 0,
-                        "max-size-bytes", 0,
-                        NULL);
                 GstElement *el_appsink_video = gst_element_factory_make("appsink", "appsink-video");
                 g_object_set(
                         el_appsink_video,
@@ -331,13 +339,13 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                         caps_ximagesrc,
                         el_videoconvert,
                         caps_videoconvert,
+                        el_queue_video,
                         el_x264enc,
                         caps_x264enc,
-                        el_queue_delme,
                         el_appsink_video,
                         NULL);
                 if (gst_element_link_many (el_ximagesrc, caps_ximagesrc, el_videoconvert, caps_videoconvert,
-                        el_x264enc, caps_x264enc, el_queue_delme, el_appsink_video, NULL) != TRUE)
+                        el_queue_video, el_x264enc, caps_x264enc, el_appsink_video, NULL) != TRUE)
                     g_printerr ("elements could not be linked.\n");
 
                 GstElement *el_pulsesrc = gst_element_factory_make("pulsesrc", "audiosrc");
@@ -346,19 +354,19 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                         "provide-clock", TRUE,
                         "do-timestamp", TRUE,
                         NULL);
+                GstElement *el_audioconvert = gst_element_factory_make("audioconvert", NULL);
+                GstElement *el_audioresample = gst_element_factory_make("audioresample", NULL);
+                GstElement *el_queue_audio = gst_element_factory_make("queue", NULL);
+                g_object_set(
+                    el_queue_audio,
+                    "leaky", 1,
+                    NULL
+                );
                 GstElement *el_opusenc = gst_element_factory_make("opusenc", NULL);
                 g_object_set(
-                        el_opusenc,
-                        "bitrate", 44100,
-                        NULL);
-                GstElement *el_queue = gst_element_factory_make("queue", NULL);
-                g_object_set(
-                        el_queue,
-                        "leaky", 1,
-                        "max-size-time", 16000000,
-                        "max-size-buffers", 0,
-                        "max-size-bytes", 0,
-                        NULL);
+                    el_opusenc,
+                    "bitrate", 44100,
+                    NULL);
                 GstElement *el_appsink_audio = gst_element_factory_make("appsink", "appsink-audio");
                 g_object_set(
                         el_appsink_audio,
@@ -368,18 +376,19 @@ PVOID sendGstreamerAudioVideo(PVOID args) {
                 gst_bin_add_many(
                         GST_BIN(pipeline),
                         el_pulsesrc,
+                        el_audioconvert,
+                        el_audioresample,
+                        el_queue_audio,
                         el_opusenc,
-                        el_queue,
                         el_appsink_audio,
                         NULL);
-                if (gst_element_link_many (el_pulsesrc, el_opusenc, el_queue, el_appsink_audio, NULL) != TRUE)
+                if (gst_element_link_many (el_pulsesrc, el_audioconvert, el_audioresample, el_queue_audio, el_opusenc, el_appsink_audio, NULL) != TRUE)
                     g_printerr ("elements could not be linked.\n");
 
-                GstPad *pad = gst_element_get_static_pad(el_pulsesrc, "src");
-                gst_pad_add_probe (pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback) cb_have_data, NULL, NULL);
-                gst_object_unref (pad);
-
-                DLOGI("[!!!ARA!!!] intercepted PAD PROBES\n");
+                //GstPad *pad = gst_element_get_static_pad(el_pulsesrc, "src");
+                //gst_pad_add_probe (pad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback) cb_have_data, NULL, NULL);
+                //gst_object_unref (pad);
+                //DLOGI("[!!!ARA!!!] intercepted PAD PROBES\n");
 
                 /*
                 std::string pl = string_format(
